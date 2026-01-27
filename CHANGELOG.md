@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/patrickjmcd/hdhr2xmltv/compare/v1.0.2...v1.1.0) (2026-01-27)
+
+
+### Features
+
+* add M3U playlist endpoints for channel lineup ([30f43c9](https://github.com/patrickjmcd/hdhr2xmltv/commit/30f43c97fa3242ad3d09fa144179da05f4f04029))
+
 ## [1.0.2](https://github.com/patrickjmcd/hdhr2xmltv/compare/v1.0.1...v1.0.2) (2026-01-27)
 
 
