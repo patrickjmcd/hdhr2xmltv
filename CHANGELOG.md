@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/patrickjmcd/hdhr2xmltv/compare/v1.0.1...v1.0.2) (2026-01-27)
+
+
+### Bug Fixes
+
+* enhance Docker workflow with release triggers and image build steps ([71d3c1e](https://github.com/patrickjmcd/hdhr2xmltv/commit/71d3c1eb7be5ff85acdb1a433a6d395d3756f33b))
+
 ## [1.0.1](https://github.com/patrickjmcd/hdhr2xmltv/compare/v1.0.0...v1.0.1) (2026-01-27)
 
 
