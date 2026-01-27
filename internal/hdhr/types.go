@@ -19,6 +19,8 @@ type Channel struct {
 	VideoCodec  string `json:"VideoCodec"`
 	AudioCodec  string `json:"AudioCodec"`
 	HD          int    `json:"HD"`
+	Favorite    int    `json:"Favorite"`
+	DRM         int    `json:"DRM"`
 	URL         string `json:"URL"`
 }
 

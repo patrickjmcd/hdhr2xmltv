@@ -117,6 +117,8 @@ services:
 | `GET /` | Index page with links |
 | `GET /xmltv` | XMLTV guide data |
 | `GET /guide.xml` | XMLTV guide data (alias) |
+| `GET /lineup.m3u` | M3U playlist of channels |
+| `GET /playlist.m3u` | M3U playlist (alias) |
 | `GET /device` | HDHomeRun device info (JSON) |
 | `GET /cache` | Cache status (JSON) |
 | `POST /cache/clear` | Clear the cache |

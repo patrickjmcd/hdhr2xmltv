@@ -214,16 +214,18 @@ func (s *Server) routes() {
 	s.mux.HandleFunc("/xmltv.xml", s.handleXMLTV)
 	s.mux.HandleFunc("/guide", s.handleXMLTV)
 	s.mux.HandleFunc("/guide.xml", s.handleXMLTV)
+	s.mux.HandleFunc("/lineup.m3u", s.handleLineupM3U)
+	s.mux.HandleFunc("/playlist.m3u", s.handleLineupM3U)
 	s.mux.HandleFunc("/device", s.handleDevice)
 	s.mux.HandleFunc("/cache", s.handleCacheStatus)
 	s.mux.HandleFunc("/cache/clear", s.handleCacheClear)
 
 	// Kubernetes probes
-	s.mux.HandleFunc("/health", s.handleHealth)   // Legacy health endpoint
-	s.mux.HandleFunc("/healthz", s.handleLivez)   // Liveness probe
-	s.mux.HandleFunc("/livez", s.handleLivez)     // Liveness probe (alias)
-	s.mux.HandleFunc("/readyz", s.handleReadyz)   // Readiness probe
-	s.mux.HandleFunc("/startupz", s.handleLivez)  // Startup probe (same as liveness)
+	s.mux.HandleFunc("/health", s.handleHealth)  // Legacy health endpoint
+	s.mux.HandleFunc("/healthz", s.handleLivez)  // Liveness probe
+	s.mux.HandleFunc("/livez", s.handleLivez)    // Liveness probe (alias)
+	s.mux.HandleFunc("/readyz", s.handleReadyz)  // Readiness probe
+	s.mux.HandleFunc("/startupz", s.handleLivez) // Startup probe (same as liveness)
 
 	// Prometheus metrics
 	s.mux.HandleFunc("/metrics", s.handleMetrics)
@@ -255,6 +257,7 @@ func (s *Server) handleIndex(w http.ResponseWriter, r *http.Request) {
 <p>HDHomeRun to XMLTV converter</p>
 <ul>
 <li><a href="/xmltv">/xmltv</a> - Get XMLTV guide data</li>
+<li><a href="/lineup.m3u">/lineup.m3u</a> - Get M3U playlist</li>
 <li><a href="/device">/device</a> - Get HDHomeRun device info</li>
 <li><a href="/cache">/cache</a> - Cache status</li>
 <li><a href="/metrics">/metrics</a> - Prometheus metrics</li>
@@ -475,6 +478,48 @@ func (s *Server) handleDevice(w http.ResponseWriter, r *http.Request) {
 		deviceInfo.DeviceID,
 		s.tunerAddress,
 	)
+}
+
+// handleLineupM3U returns an M3U playlist of the channel lineup.
+func (s *Server) handleLineupM3U(w http.ResponseWriter, r *http.Request) {
+	client := hdhr.NewClient(s.tunerAddress)
+
+	lineup, err := client.GetLineup()
+	if err != nil {
+		log.Printf("Error fetching lineup: %v", err)
+		http.Error(w, fmt.Sprintf("Failed to get lineup: %v", err), http.StatusBadGateway)
+		return
+	}
+
+	var buf bytes.Buffer
+	buf.WriteString("#EXTM3U\r\n")
+
+	for _, ch := range lineup {
+		// Determine group title based on Favorite flag
+		groupTitle := "Other"
+		if ch.Favorite == 1 {
+			groupTitle = "Favorites"
+		}
+
+		// Write EXTINF line
+		// Format: #EXTINF:-1 tvg-id="X" tvg-chno="X" tvg-name="Name" group-title="Group" tvg-type="live",Name
+		fmt.Fprintf(&buf, `#EXTINF:-1 tvg-id="%s" tvg-chno="%s" tvg-name="%s" group-title="%s" tvg-type="live",%s`,
+			ch.GuideNumber,
+			ch.GuideNumber,
+			ch.GuideName,
+			groupTitle,
+			ch.GuideName,
+		)
+		buf.WriteString("\r\n")
+
+		// Write URL line
+		buf.WriteString(ch.URL)
+		buf.WriteString("\r\n")
+	}
+
+	w.Header().Set("Content-Type", "audio/x-mpegurl; charset=utf-8")
+	w.Header().Set("Content-Disposition", `attachment; filename="lineup.m3u"`)
+	w.Write(buf.Bytes())
 }
 
 func (s *Server) handleXMLTV(w http.ResponseWriter, r *http.Request) {
