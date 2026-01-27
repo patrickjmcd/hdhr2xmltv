@@ -1,0 +1,10 @@
+services:
+  hdhr2xmltv:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - HDHOMERUN_TUNER_ADDRESS=${HDHOMERUN_TUNER_ADDRESS:-192.168.1.176}
+      - PORT=8080
+      - CACHE_TTL_MINUTES=${CACHE_TTL_MINUTES:-60}
+    restart: unless-stopped

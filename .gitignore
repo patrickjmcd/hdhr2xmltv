@@ -1,0 +1,32 @@
+# Binaries
+hdhr2xmltv
+hdhr2xmltv-server
+hdhr2xmltv.exe
+hdhr2xmltv-server.exe
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Output of go coverage tool
+*.out
+
+# Go workspace file
+go.work
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Output files
+*.xml
+
+# Environment files
+.env
+.env.local
