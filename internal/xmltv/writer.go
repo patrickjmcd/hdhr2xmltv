@@ -47,6 +47,12 @@ func (w *Writer) Write(guide []hdhr.GuideChannel) error {
 			},
 		}
 
+		// The network (e.g. "CBS") lets consumers match broadcaster names
+		// against a call-sign channel like KCTVDT.
+		if ch.Affiliate != "" && ch.Affiliate != ch.GuideName {
+			xmlCh.DisplayName = append(xmlCh.DisplayName, CommonText{Value: ch.Affiliate})
+		}
+
 		if ch.ImageURL != "" {
 			xmlCh.Icon = &Icon{Src: ch.ImageURL}
 		}
