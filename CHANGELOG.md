@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/patrickjmcd/hdhr2xmltv/compare/v1.1.0...v1.2.0) (2026-10-12)
+
+
+### Features
+
+* page the guide API and expose channel affiliates ([9b768d1](https://github.com/patrickjmcd/hdhr2xmltv/commit/9b768d1b08267b1e585e50c27ec4516e65459ca4))
+
 ## [1.1.0](https://github.com/patrickjmcd/hdhr2xmltv/compare/v1.0.2...v1.1.0) (2026-01-27)
 
 
