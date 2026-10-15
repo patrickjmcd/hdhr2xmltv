@@ -20,7 +20,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build \
     -o /hdhr2xmltv-server ./cmd/server
 
 # Runtime stage
-FROM alpine:3.19
+FROM alpine:3.24
 
 RUN apk --no-cache add ca-certificates tzdata
 
