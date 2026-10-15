@@ -1,48 +1,39 @@
-name: CI
+name: ci
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  packages: write
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
+  test:
+    uses: patrickjmcd/workflows/.github/workflows/go-ci.yml@v1
 
-      - name: Set up Go
-        uses: actions/setup-go@v7
-        with:
-          go-version: '1.27'
+  # PRs: build the image without pushing.
+  check:
+    if: github.event_name == 'pull_request'
+    uses: patrickjmcd/workflows/.github/workflows/docker-image.yml@v1
+    with:
+      push: false
 
-      - name: Build CLI
-        run: go build -v ./...
+  release:
+    if: github.event_name == 'push'
+    needs: test
+    uses: patrickjmcd/workflows/.github/workflows/release-please.yml@v1
+    with:
+      release-type: go
 
-      - name: Build Server
-        run: go build -v ./cmd/server
-
-      - name: Run tests
-        run: go test -v ./...
-
-  docker-build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build Docker image (no push)
-        uses: docker/build-push-action@v7
-        with:
-          context: .
-          push: false
-          tags: hdhr2xmltv:test
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+  # main + short-SHA on every push; 1.2.3 / 1.2 / 1 / latest on a release.
+  image:
+    if: github.event_name == 'push'
+    needs: release
+    uses: patrickjmcd/workflows/.github/workflows/docker-image.yml@v1
+    with:
+      version: ${{ needs.release.outputs.release_created == 'true' && needs.release.outputs.tag_name || '' }}
+      tags: |
+        type=semver,pattern={{major}},value=${{ needs.release.outputs.tag_name }},enable=${{ needs.release.outputs.release_created == 'true' }}
